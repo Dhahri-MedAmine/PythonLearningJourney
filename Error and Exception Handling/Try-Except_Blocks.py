@@ -1,23 +1,27 @@
-while True:
+def get_number(message):
     while True:
-        num1 = input("Enter first number: ")
+        num = input(message)
         try:
-            num1 = float(num1)
-            break
+            return float(num)
         except ValueError:
-            print(f"'{num1}' is not a number")
+            if num.lower() in ["q", "quit"]:
+                return num
+            print(f"'{num}' is not a valid number")
 
-    while True:
-        num2 = input("Enter second number: ")
-        try:
-            num2 = float(num2)
-            break
-        except ValueError:
-            print(f"'{num2}' is not a number")
+while True:
+    num1 = get_number("Enter 1st number: ")
+    if num1 in ["q", "quit"]:
+        break
+
+    num2 = get_number("Enter 2nd number: ")
+    if num2 in ["q", "quit"]:
+        break
 
     try:
-        div = num1 / num2
+        div = num1 / num2 # type: ignore
         print(f"{num1} / {num2} = {round(div, 2)}")
-        break
     except ZeroDivisionError:
         print("Cannot Divide by zero")
+
+    if input("Do you wish to continue? (Y / N): ").lower() in ["n", "no"]:
+        break
