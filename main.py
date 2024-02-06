@@ -1,1 +1,2 @@
-print("Hollow World")
+import sys
+print(sys.path)
