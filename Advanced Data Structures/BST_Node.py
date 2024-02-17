@@ -1,13 +1,11 @@
-from typing import Optional
 from enum import Enum
-from random import choice
 
 
 class Node:
     def __init__(self, data) -> None:
         self.data = data
-        self.left: Optional[Node] = None
-        self.right: Optional[Node] = None
+        self.left: Node | None = None
+        self.right: Node | None = None
 
     class TRAVERSALS(Enum):
         IN_ORDER = 1
@@ -91,48 +89,43 @@ class Node:
 
         return Node.__find_LCA(self, data1, data2)
 
+    @staticmethod
+    def __get_right_most(node):
+        if node is None:
+            return None
+        if node.right is None:
+            return node.data
+        else:
+            return Node.__get_right_most(node.right)
+        
+    def get_right_most(self):
+        return Node.__get_right_most(self)
+
+    @staticmethod
+    def __get_predecessor(node, key):
+        if node is None:
+            return None
+
+        if key == node.data:
+            if node.left is not None:
+                return node.left.get_right_most()
+
+        if key < node.data:
+            newVal = Node.__get_predecessor(node.left, key)
+            if newVal is None or newVal == node.left.data:
+                return node.data
+            else:
+                return newVal
+
+        if key > node.data:
+            newVal = Node.__get_predecessor(node.right, key)
+            if newVal is None or newVal == node.right.data:
+                return node.data
+            else:
+                return newVal
+
+    def get_predecessor(self, key):
+        return Node.__get_predecessor(self, key)
+
     def __str__(self) -> str:
         return f"{self.data}"
-
-
-class BinarySearchTree:
-    def __init__(self) -> None:
-        self.root: Optional[Node] = None
-
-    def insert(self, data):
-        if self.root is None:
-            self.root = Node(data)
-
-        self.root.insert(data)
-
-    def search(self, data):
-        if self.root is None:
-            return None
-
-        return self.root.search(data)
-
-    def display(self, order=Node.TRAVERSALS.IN_ORDER):
-        if self.root is None:
-            print(None)
-            return
-
-        self.root.display(order)
-
-    def find_LCA(self, node1, node2):
-        if self.root is None:
-            return None
-
-        return self.root.find_LCA(node1, node2)
-
-
-
-if __name__ == "__main__":
-    BST = BinarySearchTree()
-    keys = [50, 30, 70, 20, 40, 60, 80]
-    [BST.insert(key) for key in keys]
-
-    BST.display(Node.TRAVERSALS.IN_ORDER)
-    BST.display(Node.TRAVERSALS.PRE_ORDER)
-    BST.display(Node.TRAVERSALS.POST_ODER)
-
-    print(BST.find_LCA(choice(keys), choice(keys)))
