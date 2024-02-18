@@ -35,6 +35,12 @@ class BinarySearchTree:
             return None
         
         return self.root.get_predecessor(key)
+    
+    def get_successor(self, key):
+        if self.root is None:
+            return None
+        
+        return self.root.get_successor(key)
 
 if __name__ == "__main__":
     BST = BinarySearchTree()

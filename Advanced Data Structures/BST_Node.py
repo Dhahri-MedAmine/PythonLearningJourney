@@ -12,6 +12,10 @@ class Node:
         PRE_ORDER = 2
         POST_ODER = 3
 
+    class SIDES(Enum):
+        LEFT = 1
+        RIGHT = 2
+
     @staticmethod
     def __insert_node(node, data):
         if node is None:
@@ -90,42 +94,64 @@ class Node:
         return Node.__find_LCA(self, data1, data2)
 
     @staticmethod
-    def __get_right_most(node):
+    def __get_sides(node, side=SIDES.LEFT):
         if node is None:
             return None
-        if node.right is None:
-            return node.data
+
+        if side == Node.SIDES.LEFT:
+            if node.left is None:
+                return node.data
+
+            return Node.__get_sides(node.left, Node.SIDES.LEFT)
         else:
-            return Node.__get_right_most(node.right)
-        
-    def get_right_most(self):
-        return Node.__get_right_most(self)
+            if node.right is None:
+                return node.data
+
+            return Node.__get_sides(node.right, Node.SIDES.RIGHT)
+
+    def get_right(self):
+        return Node.__get_sides(self, Node.SIDES.RIGHT)
+
+    def get_left(self):
+        return Node.__get_sides(self, Node.SIDES.LEFT)
 
     @staticmethod
-    def __get_predecessor(node, key):
+    def __get_predecessor(node, key, parent=None):
         if node is None:
             return None
 
         if key == node.data:
             if node.left is not None:
-                return node.left.get_right_most()
-
-        if key < node.data:
-            newVal = Node.__get_predecessor(node.left, key)
-            if newVal is None or newVal == node.left.data:
-                return node.data
+                return node.left.get_right()
             else:
-                return newVal
-
-        if key > node.data:
-            newVal = Node.__get_predecessor(node.right, key)
-            if newVal is None or newVal == node.right.data:
-                return node.data
-            else:
-                return newVal
+                return parent.data if parent else None
+        elif key < node.data:
+            return Node.__get_predecessor(node.left, key, parent)
+        else:
+            return Node.__get_predecessor(node.right, key, node)
 
     def get_predecessor(self, key):
         return Node.__get_predecessor(self, key)
+    
+    @staticmethod
+    def __get_sucessor(node, key, parent=None):
+        if node is None:
+            return None
+        
+        if key == node.data:
+            if node.right is None:
+                return parent.data if parent else None
+            
+            return node.right.get_left()
+        
+        if key < node.data:
+            return Node.__get_sucessor(node.left, key, node)
+        
+        if key > node.data:
+            return Node.__get_sucessor(node.right, key, parent)
+
+    def get_successor(self, key):
+        return Node.__get_sucessor(self, key)
 
     def __str__(self) -> str:
         return f"{self.data}"
